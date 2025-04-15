@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 
 // Replace with your API key or move to environment variables in production
-const API_KEY = '111cd0dfbd221dea9239e1a2a941b8ae';
+const API_KEY = 'API ID';
 
 export default function WeatherApp() {
   const [weather, setWeather] = useState(null);
