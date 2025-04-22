@@ -36,3 +36,4 @@ def plot_anomalies(df):
         plt.savefig("server/output/anomaly_scatter.png")
 
 
+

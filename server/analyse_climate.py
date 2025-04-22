@@ -8,28 +8,31 @@ from utils.preprocess import preprocess_data
 from utils.visualization import plot_trend, plot_clusters, plot_anomalies
 
 # Load models
-kmeans = joblib.load("server/models/kmeans_model.pkl")
-iso = joblib.load("server/models/isolation_model.pkl")
+kmeans = joblib.load("models/kmeans_model.pkl")
+iso = joblib.load("models/isolation_model.pkl")
 
-# Load and validate dataset
-file_path = sys.argv[1]
-df = pd.read_csv(file_path)
+# Load dataset
+# file_path = sys.argv[1]
+df = pd.read_csv("datasets/climate_train.csv")
 
+# Define a list of columns that are generally needed for the analysis
 required_columns = {
     'Year', 'Country', 'Avg_Temperature_degC', 'CO2_Emissions_tons_per_capita',
     'Sea_Level_Rise_mm', 'Rainfall_mm', 'Population',
     'Renewable_Energy_pct', 'Extreme_Weather_Events', 'Forest_Area_pct'
 }
-if not required_columns.issubset(df.columns):
-    raise ValueError(f"Missing required columns. Required: {required_columns}")
+
+# Dynamically check if required columns are present and raise a warning if any are missing
+missing_columns = required_columns - set(df.columns)
+if missing_columns:
+    print(f"⚠️ Missing columns: {missing_columns}. The analysis will proceed with available columns.")
 
 # Drop non-numeric and unnecessary columns for model input
+# Avoid errors when required columns are missing and select only numeric columns
 features = df.select_dtypes(include='number').drop(columns=['Year'], errors='ignore')
 
-# Clustering
+# Handle cases where there might be missing or extra columns
 df['Cluster'] = kmeans.predict(features)
-
-# Anomaly detection
 df['Anomaly'] = iso.predict(features)  # -1 = anomaly, 1 = normal
 
 # Create output directory
@@ -42,7 +45,7 @@ plot_trend(df)
 
 # Forecasting using Prophet
 forecast_df = None
-if 'Avg_Temperature_degC' in df.columns:
+if 'Avg_Temperature_degC' in df.columns and 'Year' in df.columns:
     temp_df = df[['Year', 'Avg_Temperature_degC']].dropna()
     temp_df = temp_df.rename(columns={'Year': 'ds', 'Avg_Temperature_degC': 'y'})
     temp_df['ds'] = pd.to_datetime(temp_df['ds'].astype(str))
