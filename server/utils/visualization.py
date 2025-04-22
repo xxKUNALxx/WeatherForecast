@@ -14,18 +14,25 @@ def plot_trend(df):
         plt.savefig("server/output/temp_trend.png")
 
 def plot_clusters(df):
-    plt.figure(figsize=(8, 6))
-    sns.countplot(x='Cluster', data=df)
-    plt.title("K-Means Cluster Distribution")
-    plt.tight_layout()
-    plt.savefig("server/output/cluster_distribution.png")
+    if 'Cluster' in df.columns:
+        plt.figure(figsize=(6, 4))
+        sns.countplot(x='Cluster', data=df)
+        plt.title("K-Means Cluster Distribution")
+        plt.tight_layout()
+        plt.savefig("server/output/cluster_distribution.png")
 
 def plot_anomalies(df):
-    # Plot anomalies
-    anomaly_df = df[df['Anomaly'] == -1]
-    plt.figure(figsize=(8, 6))
-    sns.scatterplot(x='Avg_Temperature_degC', y='CO2_Emissions_tons_per_capita', hue='Anomaly', data=df, palette={1: 'blue', -1: 'red'})
-    plt.title("Anomaly Detection (Red = Outliers)")
-    plt.tight_layout()
-    plt.savefig("server/output/anomaly_scatter.png")
+    if 'Anomaly' in df.columns:
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            x='Avg_Temperature_degC', 
+            y='CO2_Emissions_tons_per_capita', 
+            hue='Anomaly', 
+            data=df, 
+            palette={1: "blue", -1: "red"}
+        )
+        plt.title("Anomaly Detection (Red = Outliers)")
+        plt.tight_layout()
+        plt.savefig("server/output/anomaly_scatter.png")
+
 
